@@ -4,7 +4,7 @@ import { AnalysisErrorAlert } from '../features/analysis/components/AnalysisErro
 import { AnalysisProgress } from '../features/analysis/components/AnalysisProgress';
 import { useAnalysis } from '../features/analysis/hooks/useAnalysis';
 import { statusMessage } from '../features/analysis/state/statusMessage';
-import { InputPanel } from '../features/input/components/InputPanel';
+import { InputPanel, type InputPanelHandle } from '../features/input/components/InputPanel';
 import { InputSummaryBar } from '../features/input/components/InputSummaryBar';
 import { Disclaimer } from '../features/report/components/Disclaimer';
 import { ReportView } from '../features/report/components/ReportView';
@@ -13,7 +13,7 @@ import { LiveRegion } from '../shared/components/LiveRegion';
 export function App() {
   const analysis = useAnalysis();
   const { state } = analysis;
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<InputPanelHandle>(null);
   const errorTitleRef = useRef<HTMLHeadingElement>(null);
   const reportTitleRef = useRef<HTMLHeadingElement>(null);
 
@@ -49,53 +49,55 @@ export function App() {
         </div>
       </header>
 
-      {state.status === 'success' ? <Disclaimer /> : null}
+      <main id="conteudo" tabIndex={-1} className="w-full flex-1">
+        {state.status === 'success' ? <Disclaimer /> : null}
+        <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6">
+          <h1 id="titulo-pagina" tabIndex={-1} className="no-print text-2xl font-semibold">
+            Analisar extrato do CNIS
+          </h1>
 
-      <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 space-y-6 px-4 py-6">
-        <h1 id="titulo-pagina" tabIndex={-1} className="no-print text-2xl font-semibold">
-          Analisar extrato do CNIS
-        </h1>
-
-        {state.status === 'success' ? (
-          <>
-            <InputSummaryBar text={text} source={source} onNewAnalysis={startNewAnalysis} />
-            <ReportView
-              result={state.result}
-              sentText={state.text}
-              titleRef={reportTitleRef}
-              onNewAnalysis={startNewAnalysis}
+          {state.status === 'success' ? (
+            <>
+              <InputSummaryBar text={text} source={source} onNewAnalysis={startNewAnalysis} />
+              <ReportView
+                result={state.result}
+                sentText={state.text}
+                titleRef={reportTitleRef}
+                onNewAnalysis={startNewAnalysis}
+              />
+            </>
+          ) : (
+            <InputPanel
+              text={text}
+              pdfMeta={source}
+              extraction={state.status === 'extracting' ? state.progress : undefined}
+              submitting={state.status === 'submitting'}
+              onTextChange={analysis.setText}
+              onExtractionStart={analysis.extractionStarted}
+              onExtractionProgress={analysis.extractionProgress}
+              onExtractionFailed={analysis.extractionFailed}
+              onSubmit={analysis.submit}
+              handleRef={inputRef}
+              footer={
+                <>
+                  {state.status === 'submitting' ? <AnalysisProgress onCancel={analysis.cancel} /> : null}
+                  {state.status === 'error' ? (
+                    <AnalysisErrorAlert
+                      error={state.error}
+                      titleRef={errorTitleRef}
+                      onRetry={analysis.retry}
+                      onReviewText={() => {
+                        analysis.backToInput();
+                        inputRef.current?.focusText();
+                      }}
+                    />
+                  ) : null}
+                </>
+              }
             />
-          </>
-        ) : (
-          <InputPanel
-            text={text}
-            pdfMeta={source}
-            extraction={state.status === 'extracting' ? state.progress : undefined}
-            submitting={state.status === 'submitting'}
-            onTextChange={analysis.setText}
-            onExtractionStart={analysis.extractionStarted}
-            onExtractionProgress={analysis.extractionProgress}
-            onExtractionFailed={analysis.extractionFailed}
-            onSubmit={analysis.submit}
-            textareaRef={textareaRef}
-            footer={
-              <>
-                {state.status === 'submitting' ? <AnalysisProgress onCancel={analysis.cancel} /> : null}
-                {state.status === 'error' ? (
-                  <AnalysisErrorAlert
-                    error={state.error}
-                    titleRef={errorTitleRef}
-                    onRetry={analysis.retry}
-                    onReviewText={() => {
-                      analysis.backToInput();
-                      textareaRef.current?.focus();
-                    }}
-                  />
-                ) : null}
-              </>
-            }
-          />
-        )}
+          )}
+        </div>
+        <LiveRegion message={statusMessage(state)} />
       </main>
 
       <footer className="no-print border-t border-line bg-surface">
@@ -104,8 +106,6 @@ export function App() {
           Nenhum documento é armazenado: o texto fica só nesta aba até ser enviado para análise.
         </p>
       </footer>
-
-      <LiveRegion message={statusMessage(state)} />
     </div>
   );
 }

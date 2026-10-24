@@ -1,5 +1,5 @@
 import { ClipboardPaste, FileUp, Search } from 'lucide-react';
-import { useId, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { useId, useImperativeHandle, useRef, useState, type ReactNode, type Ref } from 'react';
 
 import { Alert } from '../../../shared/components/Alert';
 import { Button } from '../../../shared/components/Button';
@@ -13,6 +13,11 @@ import { TextInputTab } from './TextInputTab';
 
 type InputTab = 'texto' | 'pdf';
 
+export interface InputPanelHandle {
+  /** Abre a aba de texto e foca o campo (ex.: depois de um erro de entrada). */
+  focusText: () => void;
+}
+
 export interface InputPanelProps {
   text: string;
   pdfMeta: PdfMeta | undefined;
@@ -23,7 +28,7 @@ export interface InputPanelProps {
   onExtractionProgress: (progress: ExtractionProgress) => void;
   onExtractionFailed: () => void;
   onSubmit: () => void;
-  textareaRef?: RefObject<HTMLTextAreaElement | null>;
+  handleRef?: Ref<InputPanelHandle>;
   /** Conteúdo exibido abaixo do botão (ex.: estado "Processando"). */
   footer?: ReactNode;
 }
@@ -38,7 +43,7 @@ export function InputPanel({
   onExtractionProgress,
   onExtractionFailed,
   onSubmit,
-  textareaRef,
+  handleRef,
   footer,
 }: InputPanelProps) {
   const headingId = useId();
@@ -53,8 +58,10 @@ export function InputPanel({
   function goToTextTab() {
     setTab('texto');
     // Espera o painel aparecer antes de focar.
-    requestAnimationFrame(() => (textareaRef ?? localTextareaRef).current?.focus());
+    requestAnimationFrame(() => localTextareaRef.current?.focus());
   }
+
+  useImperativeHandle(handleRef, () => ({ focusText: goToTextTab }));
 
   function handleTypedText(value: string) {
     if (value.length === 0) {
@@ -99,7 +106,7 @@ export function InputPanel({
                 errorMessage={
                   validation.ok || validation.reason !== 'too_long' ? undefined : validation.message
                 }
-                textareaRef={textareaRef ?? localTextareaRef}
+                textareaRef={localTextareaRef}
               />
             ),
           },

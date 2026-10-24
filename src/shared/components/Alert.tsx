@@ -11,7 +11,7 @@ interface AlertProps {
   id?: string;
   children?: ReactNode;
   actions?: ReactNode;
-  headingLevel?: 2 | 3 | 4;
+  headingLevel?: 1 | 2 | 3 | 4;
   /** Permite mover o foco para o título (após erro, por exemplo). */
   titleRef?: Ref<HTMLHeadingElement>;
   role?: 'alert' | 'status';

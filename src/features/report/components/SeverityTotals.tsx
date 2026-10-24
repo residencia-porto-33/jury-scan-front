@@ -38,9 +38,7 @@ export function SeverityTotals({ totals, selected, onToggle, onShowAll }: Severi
             className={cx(
               'inline-flex min-h-10 items-center gap-2 rounded-md border px-3 text-sm font-medium',
               visual.className,
-              pressed
-                ? 'ring-2 ring-current ring-offset-1 ring-offset-surface'
-                : 'opacity-90 hover:opacity-100',
+              pressed && 'ring-2 ring-current ring-offset-2 ring-offset-surface',
             )}
           >
             <span aria-hidden="true">{visual.icon}</span>
