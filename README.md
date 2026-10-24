@@ -304,3 +304,4 @@ O backend precisa liberar CORS para a origem do frontend.
   `netlify.toml` (`[[headers]]`).
 - **GitHub Pages:** publique `dist/` com `actions/deploy-pages`. Se o site ficar em subcaminho, ajuste `base`
   no `vite.config.ts`. O Pages não permite cabeçalhos customizados, então vale só a CSP da meta tag.
+# jury-scan-front
