@@ -35,7 +35,7 @@ export function IssueCard({
         checked ? 'border-risk-baixo' : 'border-line',
       )}
     >
-      <header className="space-y-1">
+      <div className="space-y-1">
         <div className="flex flex-wrap items-center gap-2">
           <h4 id={headingId} className="font-mono text-base font-semibold">
             {issue.identificador}
@@ -46,7 +46,7 @@ export function IssueCard({
           <SeverityBadge severidade={issue.severidade} />
         </div>
         <p className="font-medium">{issue.categoria}</p>
-      </header>
+      </div>
 
       {issue.descricao ? <p className="leading-relaxed">{text(issue.descricao)}</p> : null}
 
