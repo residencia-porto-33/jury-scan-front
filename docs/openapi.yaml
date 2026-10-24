@@ -1,0 +1,229 @@
+openapi: 3.0.3
+info:
+  title: JuryScan API
+  description: >
+    API de triagem inicial de extratos do CNIS (Cadastro Nacional de
+    Informações Sociais). Recebe o texto extraído de um CNIS e retorna uma
+    análise estruturada e assistida por IA, com achados priorizados,
+    evidências e sugestões para revisão humana. Ferramenta de apoio: não
+    concede ou indefere benefícios, não substitui profissional habilitado.
+  version: '1.0.0'
+  contact:
+    name: JuryScan
+servers:
+  - url: https://api.juryscan.exemplo.com
+    description: Ambiente de produção (placeholder)
+  - url: http://localhost:8000
+    description: Ambiente local de desenvolvimento
+
+tags:
+  - name: Analysis
+    description: Operações de análise de extratos do CNIS
+
+paths:
+  /api/analyze:
+    post:
+      tags: [Analysis]
+      summary: Solicita a análise de um extrato de CNIS
+      description: >
+        Recebe o texto já extraído do CNIS (extração feita no navegador,
+        o binário do PDF nunca é enviado ao backend) e retorna a análise
+        estruturada gerada pela IA, validada contra o contrato de dados.
+      operationId: analyzeCnis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalysisRequestBody'
+      responses:
+        '200':
+          description: Análise concluída com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResult'
+        '400':
+          description: Entrada inválida (texto vazio ou mal formatado)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: >
+            A resposta gerada pela IA não passou na validação do contrato
+            de dados (campos ausentes, tipos incorretos, evidência vazia)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '502':
+          description: Falha na comunicação com o serviço de IA
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '504':
+          description: Timeout ao aguardar resposta do serviço de IA
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erro interno inesperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/analyze/{analysis_request_id}:
+    get:
+      tags: [Analysis]
+      summary: Consulta o status de uma análise
+      description: >
+        Permite verificar se uma análise ainda está em processamento,
+        foi concluída ou falhou. Relevante em cenários de processamento
+        assíncrono.
+      operationId: getAnalysisStatus
+      parameters:
+        - name: analysis_request_id
+          in: path
+          required: true
+          description: Identificador da requisição de análise
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Status atual da análise
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisStatus'
+        '404':
+          description: Requisição de análise não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    AnalysisRequestBody:
+      type: object
+      required: [texto_input, origem]
+      properties:
+        texto_input:
+          type: string
+          minLength: 1
+          description: Texto do CNIS extraído (localmente) ou colado pelo usuário
+        origem:
+          type: string
+          enum: [upload_pdf, texto_colado]
+          description: Indica como o texto foi obtido
+
+    AnalysisStatus:
+      type: object
+      properties:
+        analysis_request_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [processando, concluido, erro]
+
+    AnalysisResult:
+      type: object
+      properties:
+        analysis_request_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [concluido]
+        document_summary:
+          $ref: '#/components/schemas/DocumentSummary'
+        risco_agregado:
+          type: string
+          enum: [alto, medio, baixo]
+        acoes_prioritarias:
+          type: array
+          items:
+            type: string
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/Issue'
+        severity_totals:
+          $ref: '#/components/schemas/SeverityTotals'
+
+    DocumentSummary:
+      type: object
+      properties:
+        cpf:
+          type: string
+          description: "CPF identificado, ou 'não identificado'"
+        nit_pis_pasep:
+          type: string
+          description: "NIT/PIS/PASEP identificado, ou 'não identificado'"
+        periodo:
+          type: string
+        vinculos:
+          type: array
+          items:
+            type: string
+        contexto_beneficio:
+          type: string
+
+    Issue:
+      type: object
+      required:
+        - identificador_exibicao
+        - severidade
+        - categoria
+        - evidencia
+        - sugestao
+        - confianca
+      properties:
+        identificador_exibicao:
+          type: string
+          example: 'CNIS-001'
+        severidade:
+          type: string
+          enum: [alta, media, baixa, info]
+        categoria:
+          type: string
+        descricao:
+          type: string
+        evidencia:
+          type: string
+          description: Trecho literal do texto original que sustenta o achado
+        sugestao:
+          type: string
+        impacto:
+          type: string
+        confianca:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Confiança do modelo (0 a 1). Não representa certeza jurídica.
+
+    SeverityTotals:
+      type: object
+      properties:
+        alta:
+          type: integer
+        media:
+          type: integer
+        baixa:
+          type: integer
+        info:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Mensagem de erro amigável, sem detalhes internos/sensíveis

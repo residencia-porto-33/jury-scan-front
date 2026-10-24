@@ -1,0 +1,196 @@
+@import 'tailwindcss';
+
+/*
+ * Tokens de cor do JuryScan.
+ * Todos os pares texto/fundo foram escolhidos para contraste >= 4.5:1 (WCAG AA)
+ * e o anel de foco >= 3:1 contra as superfícies.
+ */
+:root {
+  --bg: #f4f4f5;
+  --surface: #ffffff;
+  --surface-muted: #fafafa;
+  --fg: #18181b;
+  --fg-muted: #52525b;
+  --border: #d4d4d8;
+  --border-strong: #a1a1aa;
+
+  --primary: #1e3a8a;
+  --primary-hover: #1e40af;
+  --primary-fg: #ffffff;
+  --focus: #2563eb;
+
+  --sev-alta-fg: #b91c1c;
+  --sev-alta-bg: #fef2f2;
+  --sev-alta-border: #fca5a5;
+  --sev-media-fg: #92400e;
+  --sev-media-bg: #fffbeb;
+  --sev-media-border: #fcd34d;
+  --sev-baixa-fg: #1d4ed8;
+  --sev-baixa-bg: #eff6ff;
+  --sev-baixa-border: #93c5fd;
+  --sev-info-fg: #3f3f46;
+  --sev-info-bg: #f4f4f5;
+  --sev-info-border: #a1a1aa;
+
+  --risk-alto-fg: #b91c1c;
+  --risk-alto-bg: #fef2f2;
+  --risk-medio-fg: #92400e;
+  --risk-medio-bg: #fffbeb;
+  --risk-baixo-fg: #166534;
+  --risk-baixo-bg: #f0fdf4;
+
+  --mark-bg: #fde68a;
+  --mark-fg: #18181b;
+
+  /* Altura do aviso fixo; atualizada via ResizeObserver (Disclaimer). */
+  --disclaimer-height: 0px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --surface: #17191e;
+    --surface-muted: #1d2026;
+    --fg: #f4f4f5;
+    --fg-muted: #a1a1aa;
+    --border: #3f3f46;
+    --border-strong: #71717a;
+
+    --primary: #93c5fd;
+    --primary-hover: #bfdbfe;
+    --primary-fg: #0f1115;
+    --focus: #93c5fd;
+
+    --sev-alta-fg: #fca5a5;
+    --sev-alta-bg: #3b1212;
+    --sev-alta-border: #7f1d1d;
+    --sev-media-fg: #fcd34d;
+    --sev-media-bg: #3a2a05;
+    --sev-media-border: #78350f;
+    --sev-baixa-fg: #93c5fd;
+    --sev-baixa-bg: #10233f;
+    --sev-baixa-border: #1e3a8a;
+    --sev-info-fg: #d4d4d8;
+    --sev-info-bg: #27272a;
+    --sev-info-border: #52525b;
+
+    --risk-alto-fg: #fca5a5;
+    --risk-alto-bg: #3b1212;
+    --risk-medio-fg: #fcd34d;
+    --risk-medio-bg: #3a2a05;
+    --risk-baixo-fg: #86efac;
+    --risk-baixo-bg: #0f2d1a;
+
+    --mark-bg: #facc15;
+    --mark-fg: #0f1115;
+  }
+}
+
+@theme inline {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-fg: var(--primary-fg);
+  --color-focus: var(--focus);
+
+  --color-sev-alta: var(--sev-alta-fg);
+  --color-sev-alta-bg: var(--sev-alta-bg);
+  --color-sev-alta-line: var(--sev-alta-border);
+  --color-sev-media: var(--sev-media-fg);
+  --color-sev-media-bg: var(--sev-media-bg);
+  --color-sev-media-line: var(--sev-media-border);
+  --color-sev-baixa: var(--sev-baixa-fg);
+  --color-sev-baixa-bg: var(--sev-baixa-bg);
+  --color-sev-baixa-line: var(--sev-baixa-border);
+  --color-sev-info: var(--sev-info-fg);
+  --color-sev-info-bg: var(--sev-info-bg);
+  --color-sev-info-line: var(--sev-info-border);
+
+  --color-risk-alto: var(--risk-alto-fg);
+  --color-risk-alto-bg: var(--risk-alto-bg);
+  --color-risk-medio: var(--risk-medio-fg);
+  --color-risk-medio-bg: var(--risk-medio-bg);
+  --color-risk-baixo: var(--risk-baixo-fg);
+  --color-risk-baixo-bg: var(--risk-baixo-bg);
+
+  --color-mark: var(--mark-bg);
+  --color-mark-fg: var(--mark-fg);
+}
+
+@layer base {
+  html {
+    /* WCAG 2.4.11: o aviso fixo não pode cobrir o elemento focado. */
+    scroll-padding-top: calc(var(--disclaimer-height) + 1rem);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-bg text-fg font-sans antialiased;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  mark {
+    background-color: var(--mark-bg);
+    color: var(--mark-fg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Impressão: só o relatório, com o aviso em todas as páginas e sem controles. */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .no-print,
+  button,
+  [role='toolbar'] {
+    display: none !important;
+  }
+
+  .print-disclaimer {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-bottom: 1px solid #000;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .print-body {
+    margin-top: 5rem;
+  }
+
+  .print-break-avoid {
+    break-inside: avoid;
+  }
+}
