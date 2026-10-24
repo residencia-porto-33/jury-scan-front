@@ -13,7 +13,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings 0",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.test.json && tsc --noEmit -p tsconfig.node.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",

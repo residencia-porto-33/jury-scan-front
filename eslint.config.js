@@ -22,7 +22,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-      '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/consistent-type-imports': ['error', { disallowTypeAnnotations: false }],
       // LGPD: nenhum console.* com conteúdo do documento. Use `shared/lib/logger.ts`.
       'no-console': 'error',
       'no-restricted-globals': [

@@ -1,0 +1,30 @@
+INSS - Instituto Nacional do Seguro Social
+CNIS - Cadastro Nacional de Informações Sociais
+Extrato Previdenciário
+DOCUMENTO FICTÍCIO PARA TESTES - DADOS INVENTADOS
+
+Identificação do Filiado
+NIT: 123.45678.90-0   CPF: 123.456.789-00   Nome: MARIA FICTICIA DE TESTE
+Data de nascimento: 01/01/1970   Nome da mãe: JOANA FICTICIA DE TESTE
+
+Relações Previdenciárias
+Seq.   NIT   Código Emp.   Origem do Vínculo   Tipo Filiado no Vínculo   Data Início   Data Fim   Últ. Remun.   Indicadores
+1   123.45678.90-0   00.000.000/0001-00   EMPRESA FICTICIA ALFA LTDA   Empregado   01/03/1995   31/12/2001   12/2001
+2   123.45678.90-0   11.111.111/0001-11   COMERCIO FICTICIO BETA SA   Empregado   01/02/2002      06/2010   PEXT
+3   123.45678.90-0      RECOLHIMENTO   Contribuinte Individual   01/01/2012   31/12/2015      IREC-LC123
+4   123.45678.90-0   22.222.222/0001-22   SERVICOS FICTICIOS GAMA EIRELI   Empregado   01/03/2010   30/06/2014   06/2014
+
+Remunerações - Seq. 2
+Competência   Remuneração   Indicadores
+01/2010   1.850,00
+02/2010   1.850,00
+03/2010      PREM-EXT
+04/2010   1.920,00
+05/2010   1.920,00
+06/2010   1.920,00
+
+Contribuições - Seq. 3
+Competência   Data Pgto.   Contribuição   Salário Contribuição   Indicadores
+01/2012   15/02/2012   62,20   311,00   IREC-LC123
+02/2012   15/03/2012   62,20   311,00   IREC-LC123
+03/2012      0,00   0,00   PREC-MENOR-MIN
