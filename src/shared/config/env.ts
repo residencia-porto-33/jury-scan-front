@@ -23,6 +23,7 @@ const vars = import.meta.env;
 
 export const env = {
   apiBaseUrl: readUrl(vars.VITE_API_BASE_URL, 'http://localhost:8000'),
+  apiKey: vars.VITE_API_KEY?.trim() || undefined,
   requestTimeoutMs: readNumber(vars.VITE_REQUEST_TIMEOUT_MS, 90_000),
   // TODO(backend): o openapi.yaml só declara `minLength: 1` em `texto_input`.
   // Confirmar com o backend os limites reais de min/max e ajustar os defaults.

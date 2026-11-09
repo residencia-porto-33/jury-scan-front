@@ -120,6 +120,16 @@ describe('normalizeAnalysis — variações', () => {
     expect(result.discardedCount).toBe(1);
   });
 
+  it('soma achados_descartados informados pelo backend', () => {
+    const result = normalizeAnalysis({ ...analiseCompleta, achados_descartados: 3 }, cnisText);
+    expect(result.discardedCount).toBe(3);
+  });
+
+  it('reconhece documento_parece_cnis=false como pendência documental', () => {
+    const result = normalizeAnalysis({ ...analiseSemAchados, documento_parece_cnis: false }, cnisText);
+    expect(result.documentPending).toBe(true);
+  });
+
   it('recalcula totais divergentes e avisa só com números', () => {
     const warn = vi.spyOn(logger, 'warn');
     const result = normalizeAnalysis(analiseTotaisDivergentes, cnisText);

@@ -35,6 +35,18 @@ describe('analyzeCnis', () => {
     expect(received).toEqual(request);
   });
 
+  it('envia X-API-Key quando apiKey é informada', async () => {
+    let apiKeyHeader: string | null = null;
+    server.use(
+      http.post(ANALYZE_URL, ({ request: req }) => {
+        apiKeyHeader = req.headers.get('x-api-key');
+        return HttpResponse.json(analiseCompleta);
+      }),
+    );
+    await expect(analyzeCnis(request, { apiKey: 'chave-teste' })).resolves.toEqual(analiseCompleta);
+    expect(apiKeyHeader).toBe('chave-teste');
+  });
+
   it.each([
     [400, 'invalid_input'],
     [413, 'too_large'],

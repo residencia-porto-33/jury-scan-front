@@ -10,6 +10,7 @@ export interface AnalyzeOptions {
   signal?: AbortSignal;
   timeoutMs?: number;
   baseUrl?: string;
+  apiKey?: string;
 }
 
 /**
@@ -18,7 +19,7 @@ export interface AnalyzeOptions {
  * o backend já repete internamente no 422 e cada chamada custa uma inferência.
  */
 export async function analyzeCnis(request: AnalyzeRequest, options: AnalyzeOptions = {}): Promise<unknown> {
-  const { signal, timeoutMs = env.requestTimeoutMs, baseUrl = env.apiBaseUrl } = options;
+  const { signal, timeoutMs = env.requestTimeoutMs, baseUrl = env.apiBaseUrl, apiKey = env.apiKey } = options;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(TIMEOUT), timeoutMs);
   const onCancel = () => controller.abort(CANCELLED);
@@ -26,10 +27,18 @@ export async function analyzeCnis(request: AnalyzeRequest, options: AnalyzeOptio
   if (signal?.aborted) onCancel();
   else signal?.addEventListener('abort', onCancel, { once: true });
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  };
+  if (apiKey) {
+    headers['X-API-Key'] = apiKey;
+  }
+
   try {
     const response = await fetch(`${baseUrl}/api/analyze`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      headers,
       body: JSON.stringify(request),
       signal: controller.signal,
       credentials: 'omit',

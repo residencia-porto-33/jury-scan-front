@@ -242,14 +242,21 @@ export function normalizeAnalysis(raw: unknown, sentText: string): NormalizedAna
   const totals = computeTotals(issues);
   warnIfTotalsDiverge(raw.severity_totals, totals);
 
+  const apiDiscarded =
+    typeof raw.achados_descartados === 'number' &&
+    Number.isFinite(raw.achados_descartados) &&
+    raw.achados_descartados > 0
+      ? Math.floor(raw.achados_descartados)
+      : 0;
+
   return {
     summary,
     issues,
     totals,
     risco,
     acoesPrioritarias,
-    discardedCount,
-    documentPending: isDocumentPending(issues),
+    discardedCount: discardedCount + apiDiscarded,
+    documentPending: raw.documento_parece_cnis === false || isDocumentPending(issues),
     meta: {
       analysisRequestId: optionalString(raw.analysis_request_id),
       promptVersion: optionalString(raw.prompt_version),

@@ -47,13 +47,16 @@ export interface RawDocumentSummary {
 export interface RawAnalysisResponse {
   analysis_request_id?: string;
   status?: string;
+  documento_parece_cnis?: boolean;
   document_summary: RawDocumentSummary;
   issues: RawIssue[];
   severity_totals?: Partial<Record<Severidade | 'total', number>>;
+  achados_descartados?: number;
   risco_agregado: string;
   acoes_prioritarias: string[];
   prompt_version?: string;
   modelo_versao?: string;
+  aviso_revisao_humana?: string;
 }
 
 // ---------------------------------------------------------------------------
